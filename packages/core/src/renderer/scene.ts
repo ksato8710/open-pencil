@@ -3,6 +3,7 @@ import type { SceneNode, SceneGraph } from '../scene-graph'
 import type { Canvas, EmbindEnumEntity, Path } from 'canvaskit-wasm'
 import type { Color } from '../types'
 import type { SkiaRenderer, RenderOverlays } from './renderer'
+import { renderConnector } from './connector'
 
 function isCulled(
   r: SkiaRenderer,
@@ -67,6 +68,8 @@ function renderNodeContent(
     r.renderSection(canvas, node, graph)
   } else if (node.type === 'COMPONENT_SET') {
     r.renderComponentSet(canvas, node, graph)
+  } else if (node.type === 'CONNECTOR') {
+    renderConnector(r, canvas, node, graph)
   } else {
     r.renderShape(canvas, node, graph)
   }
@@ -92,7 +95,8 @@ function renderChildren(
   absY: number
 ): void {
   const isClippableContainer =
-    node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE'
+    node.type === 'FRAME' || node.type === 'COMPONENT' || node.type === 'INSTANCE' ||
+    node.type === 'STICKY' || node.type === 'SHAPE_WITH_TEXT'
   if (isClippableContainer && node.clipsContent && node.childIds.length > 0) {
     canvas.save()
     const hasRadius = node.cornerRadius > 0 || (node.independentCorners &&

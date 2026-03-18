@@ -270,7 +270,9 @@ export class SkiaRenderer {
       type === 'COMPONENT' ||
       type === 'INSTANCE' ||
       type === 'SECTION' ||
-      type === 'GROUP'
+      type === 'GROUP' ||
+      type === 'STICKY' ||
+      type === 'SHAPE_WITH_TEXT'
     )
   }
 
