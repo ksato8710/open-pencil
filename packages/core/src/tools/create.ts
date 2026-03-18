@@ -1,6 +1,8 @@
 import { parseColor } from '../color'
 import { createIconFromPaths } from '../icon-render'
 import { fetchIcons, searchIconsBatch } from '../iconify'
+import { createSchedule as createScheduleFn } from '../figjam/schedule'
+import type { ScheduleActivity } from '../figjam/schedule'
 
 import { defineTool, nodeSummary } from './schema'
 
@@ -431,5 +433,38 @@ export const createShapeWithText = defineTool({
       args.height ?? 200
     )
     return { id: node.id, name: node.name, type: node.type }
+  }
+})
+
+export const createScheduleTool = defineTool({
+  name: 'create_schedule',
+  mutates: true,
+  description:
+    'Create a Gantt chart / schedule timeline with month/week headers and activity bars.',
+  params: {
+    title: { type: 'string', description: 'Schedule title' },
+    start_date: { type: 'string', description: 'Timeline start date (YYYY-MM-DD)', required: true },
+    end_date: { type: 'string', description: 'Timeline end date (YYYY-MM-DD)', required: true },
+    activities: {
+      type: 'string',
+      description: 'JSON array of activities: [{name, startDate, endDate, color?}]',
+      required: true
+    },
+    x: { type: 'number', description: 'X position' },
+    y: { type: 'number', description: 'Y position' },
+    parent_id: { type: 'string', description: 'Parent node ID' }
+  },
+  execute: (figma, args) => {
+    const parentId = args.parent_id ?? figma.currentPageId
+    const activities: ScheduleActivity[] = JSON.parse(args.activities)
+    const ids = createScheduleFn(figma.graph, parentId, {
+      startDate: args.start_date,
+      endDate: args.end_date,
+      activities,
+      title: args.title,
+      x: args.x,
+      y: args.y,
+    })
+    return { ids, count: ids.length }
   }
 })
