@@ -620,7 +620,20 @@ export function nodeChangeToProps(
     autoRename: (nc.autoRename ?? true) as boolean,
     boundVariables: extractBoundVariables(nc),
     clipsContent: nc.frameMaskDisabled === false && nc.resizeToFit !== true,
-    componentId: extractSymbolId(nc)
+    componentId: extractSymbolId(nc),
+    ...convertConnectorProps(nc)
+  }
+}
+
+function convertConnectorProps(nc: NodeChange): Partial<SceneNode> {
+  if (mapNodeType(nc.type) !== 'CONNECTOR') return {}
+  const start = nc.connectorStart as { position?: Vector } | undefined
+  const end = nc.connectorEnd as { position?: Vector } | undefined
+  const lineStyle = nc.connectorLineStyle as string | undefined
+  return {
+    connectorStartPosition: start?.position ? { x: start.position.x, y: start.position.y } : null,
+    connectorEndPosition: end?.position ? { x: end.position.x, y: end.position.y } : null,
+    connectorLineStyle: lineStyle === 'ELBOWED' ? 'ELBOWED' : 'STRAIGHT'
   }
 }
 

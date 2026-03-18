@@ -327,6 +327,12 @@ export interface SceneNode {
   flipY: boolean
 
   textPicture: Uint8Array | null
+
+  connectorStartPosition: Vector | null
+  connectorEndPosition: Vector | null
+  connectorStartNodeId: string | null
+  connectorEndNodeId: string | null
+  connectorLineStyle: 'ELBOWED' | 'STRAIGHT'
 }
 
 export type VariableType = 'COLOR' | 'FLOAT' | 'STRING' | 'BOOLEAN'
@@ -458,6 +464,11 @@ function createDefaultNode(type: NodeType, overrides: Partial<SceneNode> = {}): 
     flipX: false,
     flipY: false,
     textPicture: null,
+    connectorStartPosition: null,
+    connectorEndPosition: null,
+    connectorStartNodeId: null,
+    connectorEndNodeId: null,
+    connectorLineStyle: 'STRAIGHT',
     ...overrides
   }
 }
@@ -986,6 +997,31 @@ export class SceneGraph {
       layoutAlignSelf: 'STRETCH'
     })
     return frame
+  }
+
+  createConnector(
+    parentId: string,
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    lineStyle: 'ELBOWED' | 'STRAIGHT' = 'STRAIGHT'
+  ): SceneNode {
+    const x = Math.min(startX, endX)
+    const y = Math.min(startY, endY)
+    const width = Math.abs(endX - startX) || 1
+    const height = Math.abs(endY - startY) || 1
+    return this.createNode('CONNECTOR', parentId, {
+      name: 'Connector',
+      x,
+      y,
+      width,
+      height,
+      connectorStartPosition: { x: startX, y: startY },
+      connectorEndPosition: { x: endX, y: endY },
+      connectorLineStyle: lineStyle,
+      strokes: [{ color: { r: 0, g: 0, b: 0, a: 1 }, weight: 2, opacity: 1, visible: true, align: 'CENTER' }]
+    })
   }
 
   createInstance(

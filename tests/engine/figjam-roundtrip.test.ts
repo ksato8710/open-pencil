@@ -51,6 +51,23 @@ describe('FigJam roundtrip', () => {
     expect(shape!.height).toBe(150)
   })
 
+  test('connector node survives export → re-import', async () => {
+    const graph = new SceneGraph()
+    const page = graph.getPages()[0]
+    graph.createConnector(page.id, 50, 100, 350, 400, 'ELBOWED')
+
+    const exported = await exportFigFile(graph)
+    const reimported = await parseFigFile(exported.buffer as ArrayBuffer)
+
+    const allNodes = [...reimported.getAllNodes()]
+    const connector = allNodes.find((n) => n.type === 'CONNECTOR')
+    expect(connector).toBeDefined()
+    expect(connector!.name).toBe('Connector')
+    expect(connector!.connectorStartPosition).toEqual({ x: 50, y: 100 })
+    expect(connector!.connectorEndPosition).toEqual({ x: 350, y: 400 })
+    expect(connector!.connectorLineStyle).toBe('ELBOWED')
+  })
+
   test('multiple stickies with different colors', async () => {
     const graph = new SceneGraph()
     const page = graph.getPages()[0]

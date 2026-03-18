@@ -84,6 +84,38 @@ describe('FigJam support', () => {
     })
   })
 
+  describe('SceneGraph.createConnector', () => {
+    test('creates a connector node with start/end positions', () => {
+      const { graph, pageId } = makeGraph()
+      const connector = graph.createConnector(pageId, 100, 200, 400, 500)
+
+      expect(connector.type).toBe('CONNECTOR')
+      expect(connector.name).toBe('Connector')
+      expect(connector.connectorStartPosition).toEqual({ x: 100, y: 200 })
+      expect(connector.connectorEndPosition).toEqual({ x: 400, y: 500 })
+      expect(connector.connectorLineStyle).toBe('STRAIGHT')
+      expect(connector.strokes).toHaveLength(1)
+      expect(connector.strokes[0].weight).toBe(2)
+    })
+
+    test('computes bounding box from coordinates', () => {
+      const { graph, pageId } = makeGraph()
+      const connector = graph.createConnector(pageId, 300, 100, 100, 400)
+
+      expect(connector.x).toBe(100)
+      expect(connector.y).toBe(100)
+      expect(connector.width).toBe(200)
+      expect(connector.height).toBe(300)
+    })
+
+    test('supports ELBOWED line style', () => {
+      const { graph, pageId } = makeGraph()
+      const connector = graph.createConnector(pageId, 0, 0, 100, 100, 'ELBOWED')
+
+      expect(connector.connectorLineStyle).toBe('ELBOWED')
+    })
+  })
+
   describe('NodeType includes STICKY', () => {
     test('STICKY is a valid container type', () => {
       const { graph, pageId } = makeGraph()

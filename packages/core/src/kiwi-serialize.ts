@@ -395,6 +395,17 @@ function serializeVariableBindings(
   if (entries.length > 0) nc.variableConsumptionMap = { entries }
 }
 
+function serializeConnectorProps(node: SceneNode, nc: KiwiNodeChange): void {
+  if (node.type !== 'CONNECTOR') return
+  if (node.connectorStartPosition) {
+    nc.connectorStart = { position: node.connectorStartPosition }
+  }
+  if (node.connectorEndPosition) {
+    nc.connectorEnd = { position: node.connectorEndPosition }
+  }
+  nc.connectorLineStyle = node.connectorLineStyle === 'ELBOWED' ? 'ELBOWED' : 'STRAIGHT'
+}
+
 export function sceneNodeToKiwi(
   node: SceneNode,
   parentGuid: GUID,
@@ -482,6 +493,8 @@ export function sceneNodeToKiwi(
   }
 
   if (!node.autoRename) nc.autoRename = false
+
+  serializeConnectorProps(node, nc)
 
   serializeLayoutProps(node, nc)
   serializeGeometry(node, nc, blobs)

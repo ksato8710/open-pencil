@@ -361,6 +361,45 @@ export const createSticky = defineTool({
   }
 })
 
+export const createConnector = defineTool({
+  name: 'create_connector',
+  mutates: true,
+  description:
+    'Create a connector line between two points (FigJam-style). Draws a line from start to end coordinates.',
+  params: {
+    start_x: { type: 'number', description: 'Start X position', required: true },
+    start_y: { type: 'number', description: 'Start Y position', required: true },
+    end_x: { type: 'number', description: 'End X position', required: true },
+    end_y: { type: 'number', description: 'End Y position', required: true },
+    line_style: {
+      type: 'string',
+      description: 'Line routing style (default STRAIGHT)',
+      enum: ['STRAIGHT', 'ELBOWED']
+    },
+    start_node_id: { type: 'string', description: 'Node ID to connect from (visual hint only)' },
+    end_node_id: { type: 'string', description: 'Node ID to connect to (visual hint only)' },
+    parent_id: { type: 'string', description: 'Parent node ID to nest inside' }
+  },
+  execute: (figma, args) => {
+    const parentId = args.parent_id ?? figma.currentPageId
+    const node = figma.graph.createConnector(
+      parentId,
+      args.start_x,
+      args.start_y,
+      args.end_x,
+      args.end_y,
+      (args.line_style ?? 'STRAIGHT') as 'STRAIGHT' | 'ELBOWED'
+    )
+    if (args.start_node_id) {
+      figma.graph.updateNode(node.id, { connectorStartNodeId: args.start_node_id })
+    }
+    if (args.end_node_id) {
+      figma.graph.updateNode(node.id, { connectorEndNodeId: args.end_node_id })
+    }
+    return { id: node.id, name: node.name, type: node.type }
+  }
+})
+
 export const createShapeWithText = defineTool({
   name: 'create_shape_with_text',
   mutates: true,
