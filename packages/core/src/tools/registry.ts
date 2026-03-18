@@ -8,7 +8,8 @@ import {
 import {
   createShape, render, createComponent, createInstance,
   createPage, createVector, createSlice, fetchIconsTool, insertIcon, searchIconsTool,
-  createSticky, createShapeWithText, createConnector, createScheduleTool
+  createSticky, createShapeWithText, createConnector, createScheduleTool,
+  createPersonaTool, createJourneyMapTool
 } from './create'
 import {
   setFill, setStroke, setEffects, updateNode, setLayout, setConstraints,
@@ -107,6 +108,8 @@ export const EXTENDED_TOOLS: ToolDef[] = [
   createShapeWithText,
   createConnector,
   createScheduleTool,
+  createPersonaTool,
+  createJourneyMapTool,
   // Modify (advanced)
   setEffects,
   setOpacity,

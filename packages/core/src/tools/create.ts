@@ -3,6 +3,10 @@ import { createIconFromPaths } from '../icon-render'
 import { fetchIcons, searchIconsBatch } from '../iconify'
 import { createSchedule as createScheduleFn } from '../figjam/schedule'
 import type { ScheduleActivity } from '../figjam/schedule'
+import { createPersona as createPersonaFn } from '../figjam/persona'
+import type { PersonaData } from '../figjam/persona'
+import { createJourneyMap as createJourneyMapFn } from '../figjam/journey-map'
+import type { JourneyStage } from '../figjam/journey-map'
 
 import { defineTool, nodeSummary } from './schema'
 
@@ -462,6 +466,74 @@ export const createScheduleTool = defineTool({
       endDate: args.end_date,
       activities,
       title: args.title,
+      x: args.x,
+      y: args.y,
+    })
+    return { ids, count: ids.length }
+  }
+})
+
+export const createPersonaTool = defineTool({
+  name: 'create_persona',
+  mutates: true,
+  description:
+    'Create a UX persona card with avatar, name, role, bio, goals, and frustrations.',
+  params: {
+    name: { type: 'string', description: 'Persona name', required: true },
+    role: { type: 'string', description: 'Role / job title', required: true },
+    age: { type: 'number', description: 'Age' },
+    location: { type: 'string', description: 'Location' },
+    bio: { type: 'string', description: 'Short biography' },
+    quote: { type: 'string', description: 'Representative quote' },
+    goals: { type: 'string', description: 'JSON array of goal strings' },
+    frustrations: { type: 'string', description: 'JSON array of frustration strings' },
+    avatar_color: { type: 'string', description: 'Avatar circle hex color (default #3B82F6)' },
+    x: { type: 'number', description: 'X position' },
+    y: { type: 'number', description: 'Y position' },
+    parent_id: { type: 'string', description: 'Parent node ID' },
+  },
+  execute: (figma, args) => {
+    const parentId = args.parent_id ?? figma.currentPageId
+    const data: PersonaData = {
+      name: args.name,
+      role: args.role,
+      age: args.age,
+      location: args.location,
+      bio: args.bio,
+      quote: args.quote,
+      goals: args.goals ? JSON.parse(args.goals) : undefined,
+      frustrations: args.frustrations ? JSON.parse(args.frustrations) : undefined,
+      avatarColor: args.avatar_color,
+    }
+    const id = createPersonaFn(figma.graph, parentId, data, args.x, args.y)
+    return { id }
+  }
+})
+
+export const createJourneyMapTool = defineTool({
+  name: 'create_journey_map',
+  mutates: true,
+  description:
+    'Create a user journey map with stages, actions, thoughts, emotions, pain points, and opportunities.',
+  params: {
+    title: { type: 'string', description: 'Journey map title' },
+    persona_name: { type: 'string', description: 'Associated persona name' },
+    stages: {
+      type: 'string',
+      description: 'JSON array of JourneyStage objects: [{name, actions, thoughts, emotion, painPoints?, opportunities?, touchpoints?}]',
+      required: true,
+    },
+    x: { type: 'number', description: 'X position' },
+    y: { type: 'number', description: 'Y position' },
+    parent_id: { type: 'string', description: 'Parent node ID' },
+  },
+  execute: (figma, args) => {
+    const parentId = args.parent_id ?? figma.currentPageId
+    const stages: JourneyStage[] = JSON.parse(args.stages)
+    const ids = createJourneyMapFn(figma.graph, parentId, {
+      title: args.title,
+      personaName: args.persona_name,
+      stages,
       x: args.x,
       y: args.y,
     })
