@@ -60,7 +60,8 @@ describe('importClipboardNodes', () => {
   it('skips non-visual Figma types', () => {
     const { graph, pageId } = createGraphWithPage()
 
-    const nonVisualTypes = ['WIDGET', 'STAMP', 'STICKY', 'CONNECTOR', 'CODE_BLOCK', 'SHAPE_WITH_TEXT', 'TABLE_NODE', 'TABLE_CELL']
+    // STICKY, SHAPE_WITH_TEXT, CONNECTOR are now visual (FigJam support)
+    const nonVisualTypes = ['WIDGET', 'STAMP', 'CODE_BLOCK', 'TABLE_NODE', 'TABLE_CELL']
     const nodeChanges = [
       { guid: { sessionID: 0, localID: 0 }, type: 'DOCUMENT', name: 'Doc' },
       { guid: { sessionID: 0, localID: 1 }, parentIndex: { guid: { sessionID: 0, localID: 0 }, position: '!' }, type: 'CANVAS', name: 'Page' },
