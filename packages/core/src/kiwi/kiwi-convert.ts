@@ -199,7 +199,8 @@ const NODE_TYPE_MAP: Record<string, NodeType | 'DOCUMENT' | 'VARIABLE'> = {
   INSTANCE: 'INSTANCE',
   SYMBOL: 'COMPONENT',
   CONNECTOR: 'CONNECTOR',
-  SHAPE_WITH_TEXT: 'SHAPE_WITH_TEXT'
+  SHAPE_WITH_TEXT: 'SHAPE_WITH_TEXT',
+  STICKY: 'STICKY'
 }
 
 function mapNodeType(type?: string): NodeType | 'DOCUMENT' | 'VARIABLE' {

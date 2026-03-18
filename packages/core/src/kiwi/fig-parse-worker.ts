@@ -13,7 +13,7 @@ interface FigKiwiPayload {
 
 function parseFigKiwiContainer(data: Uint8Array): FigKiwiPayload | null {
   const header = new TextDecoder().decode(data.slice(0, 8))
-  if (header !== 'fig-kiwi') return null
+  if (header !== 'fig-kiwi' && header !== 'fig-jam.') return null
 
   const view = new DataView(data.buffer, data.byteOffset, data.byteLength)
   let offset = 12

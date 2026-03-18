@@ -331,3 +331,66 @@ export const searchIconsTool = defineTool({
     }
   }
 })
+
+export const createSticky = defineTool({
+  name: 'create_sticky',
+  mutates: true,
+  description:
+    'Create a sticky note (FigJam-style). Creates a colored square with centered text inside.',
+  params: {
+    text: { type: 'string', description: 'Text content of the sticky note', required: true },
+    x: { type: 'number', description: 'X position', required: true },
+    y: { type: 'number', description: 'Y position', required: true },
+    color: {
+      type: 'string',
+      description: 'Background color hex. Defaults to yellow (#FEF3C7)',
+      enum: ['#FEF3C7', '#D1FAE5', '#DBEAFE', '#FCE7F3', '#EDE9FE']
+    },
+    parent_id: { type: 'string', description: 'Parent node ID to nest inside' }
+  },
+  execute: (figma, args) => {
+    const parentId = args.parent_id ?? figma.currentPageId
+    const node = figma.graph.createSticky(
+      parentId,
+      args.text,
+      args.x,
+      args.y,
+      args.color ?? '#FEF3C7'
+    )
+    return { id: node.id, name: node.name, type: node.type }
+  }
+})
+
+export const createShapeWithText = defineTool({
+  name: 'create_shape_with_text',
+  mutates: true,
+  description:
+    'Create a shape with text inside (FigJam-style). Creates a shape node containing centered text.',
+  params: {
+    shape: {
+      type: 'string',
+      description: 'Shape type',
+      required: true,
+      enum: ['RECTANGLE', 'ELLIPSE', 'ROUNDED_RECTANGLE']
+    },
+    text: { type: 'string', description: 'Text content inside the shape', required: true },
+    x: { type: 'number', description: 'X position', required: true },
+    y: { type: 'number', description: 'Y position', required: true },
+    width: { type: 'number', description: 'Width in pixels (default 200)', min: 1 },
+    height: { type: 'number', description: 'Height in pixels (default 200)', min: 1 },
+    parent_id: { type: 'string', description: 'Parent node ID to nest inside' }
+  },
+  execute: (figma, args) => {
+    const parentId = args.parent_id ?? figma.currentPageId
+    const node = figma.graph.createShapeWithText(
+      parentId,
+      args.shape as 'RECTANGLE' | 'ELLIPSE' | 'ROUNDED_RECTANGLE',
+      args.text,
+      args.x,
+      args.y,
+      args.width ?? 200,
+      args.height ?? 200
+    )
+    return { id: node.id, name: node.name, type: node.type }
+  }
+})

@@ -81,6 +81,7 @@ export type NodeType =
   | 'INSTANCE'
   | 'CONNECTOR'
   | 'SHAPE_WITH_TEXT'
+  | 'STICKY'
 
 
 export type FillType =
@@ -468,7 +469,9 @@ const CONTAINER_TYPES = new Set<NodeType>([
   'SECTION',
   'COMPONENT',
   'COMPONENT_SET',
-  'INSTANCE'
+  'INSTANCE',
+  'STICKY',
+  'SHAPE_WITH_TEXT'
 ])
 
 export class SceneGraph {
@@ -896,6 +899,93 @@ export class SceneGraph {
     }
 
     return clone
+  }
+
+  createSticky(
+    parentId: string,
+    text: string,
+    x = 0,
+    y = 0,
+    color = '#FEF3C7'
+  ): SceneNode {
+    const size = 200
+    const r = parseInt(color.slice(1, 3), 16) / 255
+    const g = parseInt(color.slice(3, 5), 16) / 255
+    const b = parseInt(color.slice(5, 7), 16) / 255
+    const frame = this.createNode('STICKY', parentId, {
+      name: 'Sticky',
+      x,
+      y,
+      width: size,
+      height: size,
+      cornerRadius: 8,
+      topLeftRadius: 8,
+      topRightRadius: 8,
+      bottomRightRadius: 8,
+      bottomLeftRadius: 8,
+      clipsContent: true,
+      fills: [{ type: 'SOLID', color: { r, g, b, a: 1 }, opacity: 1, visible: true }],
+      layoutMode: 'VERTICAL',
+      primaryAxisAlign: 'CENTER',
+      counterAxisAlign: 'CENTER',
+      paddingTop: 16,
+      paddingBottom: 16,
+      paddingLeft: 16,
+      paddingRight: 16
+    })
+    this.createNode('TEXT', frame.id, {
+      name: 'Text',
+      text,
+      width: size - 32,
+      height: size - 32,
+      textAlignHorizontal: 'CENTER',
+      textAlignVertical: 'CENTER',
+      textAutoResize: 'HEIGHT',
+      fontSize: 16,
+      layoutAlignSelf: 'STRETCH'
+    })
+    return frame
+  }
+
+  createShapeWithText(
+    parentId: string,
+    shape: 'RECTANGLE' | 'ELLIPSE' | 'ROUNDED_RECTANGLE',
+    text: string,
+    x = 0,
+    y = 0,
+    width = 200,
+    height = 200
+  ): SceneNode {
+    const frame = this.createNode('SHAPE_WITH_TEXT', parentId, {
+      name: text || 'Shape',
+      x,
+      y,
+      width,
+      height,
+      clipsContent: true,
+      fills: [{ type: 'SOLID', color: { r: 1, g: 1, b: 1, a: 1 }, opacity: 1, visible: true }],
+      strokes: [{ color: { r: 0, g: 0, b: 0, a: 1 }, weight: 2, opacity: 1, visible: true, align: 'INSIDE' }],
+      cornerRadius: shape === 'ROUNDED_RECTANGLE' ? 12 : 0,
+      topLeftRadius: shape === 'ROUNDED_RECTANGLE' ? 12 : 0,
+      topRightRadius: shape === 'ROUNDED_RECTANGLE' ? 12 : 0,
+      bottomRightRadius: shape === 'ROUNDED_RECTANGLE' ? 12 : 0,
+      bottomLeftRadius: shape === 'ROUNDED_RECTANGLE' ? 12 : 0,
+      layoutMode: 'VERTICAL',
+      primaryAxisAlign: 'CENTER',
+      counterAxisAlign: 'CENTER'
+    })
+    this.createNode('TEXT', frame.id, {
+      name: 'Text',
+      text,
+      width: width - 16,
+      height: height - 16,
+      textAlignHorizontal: 'CENTER',
+      textAlignVertical: 'CENTER',
+      textAutoResize: 'HEIGHT',
+      fontSize: 14,
+      layoutAlignSelf: 'STRETCH'
+    })
+    return frame
   }
 
   createInstance(
