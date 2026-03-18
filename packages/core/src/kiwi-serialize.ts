@@ -143,6 +143,8 @@ export function mapToFigmaType(type: SceneNode['type']): string {
       return 'SYMBOL'
     case 'INSTANCE':
       return 'INSTANCE'
+    case 'STICKY':
+      return 'STICKY'
     case 'CONNECTOR':
       return 'CONNECTOR'
     case 'SHAPE_WITH_TEXT':
